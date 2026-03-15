@@ -1,0 +1,68 @@
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+  <!-- Header -->
+  <div style="margin-bottom: 30px;">
+    <h1 style="font-size: 28px; font-weight: bold; color: #111; margin: 0 0 8px 0;">✅ 投递审核</h1>
+    <p style="color: #666; margin: 0;">审核学生投递的岗位申请</p>
+  </div>
+
+  <% if (applications.length === 0) { %>
+  <!-- Empty State -->
+  <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 40px; text-align: center;">
+    <p style="font-size: 48px; margin: 0 0 10px 0;">✨</p>
+    <h3 style="font-size: 18px; font-weight: bold; color: #111; margin: 0 0 5px 0;">暂无投递</h3>
+    <p style="color: #666; margin: 0;">所有投递都已处理</p>
+  </div>
+  <% } else { %>
+  <!-- Applications Table -->
+  <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 20%;">岗位</th>
+            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 15%;">学生姓名</th>
+            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 20%;">投递时间</th>
+            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 15%;">状态</th>
+            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 30%;">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% applications.forEach(function(app, idx){ %>
+          <tr style="border-bottom: 1px solid #e5e7eb; background: <%= idx % 2 === 0 ? 'white' : '#f9fafb' %>;">
+            <td style="padding: 12px; color: #1f2937; font-weight: 500;"><%= app.title %></td>
+            <td style="padding: 12px; color: #4b5563;"><%= app.name || '未填写' %></td>
+            <td style="padding: 12px; color: #666; font-size: 12px;"><%= new Date(app.created_at).toLocaleDateString('zh-CN') %></td>
+            <td style="padding: 12px;">
+              <% if (app.status === 'pending') { %>
+              <span style="background: #e5e7eb; color: #374151; padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;">⏳ 待审核</span>
+              <% } else if (app.status === 'approved') { %>
+              <span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;">✅ 已通过</span>
+              <% } else if (app.status === 'rejected') { %>
+              <span style="background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;">❌ 已拒绝</span>
+              <% } %>
+            </td>
+            <td style="padding: 12px;">
+              <% if (app.status === 'pending') { %>
+              <div style="display: flex; gap: 8px;">
+                <form method="post" action="/admin/applications/<%= app.id %>/review" style="display: inline;">
+                  <input type="hidden" name="status" value="approved" />
+                  <button style="padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; background: #10b981; color: white;">✅ 通过</button>
+                </form>
+                <form method="post" action="/admin/applications/<%= app.id %>/review" style="display: inline;">
+                  <input type="hidden" name="status" value="rejected" />
+                  <button style="padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; background: #ef4444; color: white;">❌ 拒绝</button>
+                </form>
+              </div>
+              <% } else { %>
+              <span style="color: #999; font-size: 12px;">已处理</span>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% } %>
+</div>
+

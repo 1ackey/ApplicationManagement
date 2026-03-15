@@ -1,0 +1,88 @@
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="mb-10">
+    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">简历管理</h1>
+    <p class="text-gray-500 mt-2">上传PDF格式的简历文件，新简历会覆盖</p>
+  </div>
+
+  <div class="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[2rem] border border-gray-100 overflow-hidden">
+    <div class="p-8 md:p-12">
+      
+      <% if (profile.resume_url) { %>
+      <div class="mb-10 p-6 bg-emerald-50/50 border border-emerald-100 rounded-2xl flex items-center justify-between animate-in fade-in duration-500">
+        <div class="flex items-center">
+          <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mr-4 text-emerald-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div>
+            <a href="<%= profile.resume_url %>" target="_blank" class="text-lg font-bold text-gray-900 hover:text-indigo-600 transition-colors flex items-center gap-1">
+              查看简历
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+          </div>
+        </div>
+        <span class="hidden sm:block px-4 py-1.5 bg-white border border-emerald-200 text-emerald-700 text-xs font-bold rounded-full shadow-sm">
+          VALIDATED
+        </span>
+      </div>
+      <% } else { %>
+      <div class="mb-10 p-6 bg-amber-50 border border-amber-100 rounded-2xl flex items-center animate-pulse">
+        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mr-4 text-amber-500">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <p class="text-amber-800 font-bold">简历缺失：企业目前无法查看您的详细信息</p>
+      </div>
+      <% } %>
+
+      <div class="space-y-6">
+        <h4 class="text-xl font-bold text-gray-900">更新简历档案</h4>
+        
+        <form method="post" action="/student/profile/resume" enctype="multipart/form-data" class="group">
+          <label id="drop-zone" class="relative flex flex-col items-center justify-center w-full min-h-[240px] border-2 border-dashed border-gray-200 rounded-[2rem] cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition-all duration-300 group">
+            
+            <div class="text-center p-6" id="upload-placeholder">
+              <div class="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+              </div>
+              <p class="text-gray-900 font-bold text-lg">点击或拖拽文件</p>
+              <p class="text-gray-400 text-sm mt-1 font-medium text-balance">支持 PDF 或 Word 格式，建议文件大小不超过 10MB</p>
+            </div>
+
+            <div id="file-chosen" class="hidden text-center p-6 animate-in zoom-in-95">
+              <div class="w-16 h-16 bg-green-500 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-100">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              </div>
+              <p id="file-name" class="text-gray-900 font-bold text-lg mb-1 truncate max-w-xs"></p>
+              <p class="text-green-600 font-bold text-sm uppercase tracking-wider">文件已准备就绪</p>
+            </div>
+
+            <input type="file" id="resume-input" name="resume_file" class="hidden" accept=".pdf,.doc,.docx" required />
+          </label>
+
+          <div class="flex justify-center mt-8">
+            <button type="submit" class="w-full sm:w-auto px-12 py-4 bg-indigo-600 text-white text-lg font-bold rounded-2xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 hover:-translate-y-1 active:scale-95 transition-all duration-200">
+              确认并上传
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 简单的文件选中监听
+  const input = document.getElementById('resume-input');
+  const placeholder = document.getElementById('upload-placeholder');
+  const chosenDisplay = document.getElementById('file-chosen');
+  const fileNameDisplay = document.getElementById('file-name');
+  const dropZone = document.getElementById('drop-zone');
+
+  input.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      placeholder.classList.add('hidden');
+      chosenDisplay.classList.remove('hidden');
+      fileNameDisplay.textContent = e.target.files[0].name;
+      dropZone.classList.add('border-green-400', 'bg-green-50/30');
+    }
+  });
+</script>

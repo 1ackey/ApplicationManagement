@@ -1,0 +1,64 @@
+<div class="max-w-6xl mx-auto px-4 py-10">
+  <div class="mb-10">
+    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">我的投递</h1>
+    <p class="text-gray-500 mt-2 flex items-center">
+      <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+      审核实时状态
+    </p>
+  </div>
+
+  <% if (applications.length === 0) { %>
+  <div class="bg-indigo-50/50 border-2 border-dashed border-indigo-100 rounded-[2rem] py-16 px-6 text-center">
+    <div class="text-5xl mb-6">🔭</div>
+    <h3 class="text-xl font-bold text-gray-900 mb-2"></h3>
+
+  </div>
+  <% } else { %>
+
+  <div class="bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="bg-gray-50/50 border-b border-gray-100">
+            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">应聘岗位</th>
+            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">投递日期</th>
+            <th class="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">当前进度</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          <% applications.forEach(function(app){ %>
+          <tr class="group hover:bg-gray-50/50 transition-all duration-200">
+            <td class="px-8 py-6">
+              <div class="font-bold text-gray-900 text-lg group-hover:text-indigo-600 transition-colors">
+                <%= app.title %>
+              </div>
+            </td>
+            <td class="px-8 py-6 text-gray-500 font-medium tabular-nums">
+              <%= new Date(app.created_at).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }) %>
+            </td>
+            <td class="px-8 py-6 text-right">
+              <% if (app.status === 'pending') { %>
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-amber-50 text-amber-700 border border-amber-100 shadow-sm">
+                <span class="w-2 h-2 bg-amber-400 rounded-full mr-2 animate-pulse"></span>
+                审核中
+              </span>
+              <% } else if (app.status === 'approved') { %>
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
+                已通过
+              </span>
+              <% } else if (app.status === 'rejected') { %>
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-rose-50 text-rose-700 border border-rose-100 shadow-sm">
+                <span class="w-2 h-2 bg-rose-500 rounded-full mr-2"></span>
+                已拒绝
+              </span>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% } %>
+</div>
