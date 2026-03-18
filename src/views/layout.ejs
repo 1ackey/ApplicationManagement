@@ -3,66 +3,134 @@
   <head>
     <meta charset="UTF-8" />
     <title>校企合作简历投递系统</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      /* 移动端优化 */
+      @media (max-width: 640px) {
+        body { font-size: 16px; }
+        h1 { font-size: 1.5rem; }
+        h2 { font-size: 1.25rem; }
+        h3 { font-size: 1.1rem; }
+        button { min-height: 44px; min-width: 44px; }
+        input, select, textarea { min-height: 44px; }
+      }
+    </style>
   </head>
   <body class="bg-gradient-to-br from-gray-50 to-gray-100">
     <!-- Navigation -->
     <nav class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg border-b-4 border-blue-900">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-14 sm:h-16">
           <!-- Logo -->
-          <a href="/" class="text-2xl font-bold text-white hover:text-blue-100 transition">
-            UIBE-英语学院简历投递系统
+          <a href="/" class="text-sm sm:text-2xl font-bold text-white hover:text-blue-100 transition truncate pr-2">
+            <span class="inline sm:hidden">简历投递</span>
+            <span class="hidden sm:inline">UIBE-英语学院简历投递系统</span>
           </a>
 
           <!-- Desktop Navigation -->
-          <div class="hidden md:flex flex-1 justify-center space-x-4 ml-10">
+          <div class="hidden md:flex flex-1 justify-center space-x-2 lg:space-x-4 ml-10">
             <% if (currentUser && currentUser.role === 'student') { %>
-            <a href="/student/jobs" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">岗位列表</a>
-            <a href="/student/applications" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">投递记录</a>
-            <a href="/student/profile" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">个人信息</a>
+            <a href="/student/jobs" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm lg:text-base transition">岗位列表</a>
+            <a href="/student/applications" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm lg:text-base transition">投递记录</a>
+            <a href="/student/profile" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm lg:text-base transition">个人信息</a>
             <% } else if (currentUser && currentUser.role === 'company') { %>
-            <a href="/company/jobs" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">岗位管理</a>
-            <a href="/company/applications" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">投递学生</a>
+            <a href="/company/jobs" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm lg:text-base transition">岗位管理</a>
+            <a href="/company/applications" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm lg:text-base transition">投递学生</a>
             <% } else if (currentUser && currentUser.role === 'admin') { %>
-            <a href="/admin/dashboard" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">统计面板</a>
-            <a href="/admin/applications" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">投递审核</a>
-            <a href="/admin/jobs" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">岗位管理</a>
-            <a href="/admin/students" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">简历库</a>
+            <a href="/admin/dashboard" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm lg:text-base transition">统计面板</a>
+            <a href="/admin/applications" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm lg:text-base transition">投递审核</a>
+            <a href="/admin/jobs" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm lg:text-base transition">岗位管理</a>
+            <a href="/admin/students" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm lg:text-base transition">简历库</a>
             <% } %>
           </div>
 
+          <!-- Mobile Menu Button -->
+          <button id="mobile-menu-btn" class="md:hidden text-white hover:bg-blue-700 p-2 rounded-lg transition ml-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+
           <!-- User Menu -->
-          <div class="flex items-center space-x-4">
+          <div class="hidden md:flex items-center space-x-2 lg:space-x-4 ml-2">
             <% if (currentUser) { %>
-            <span class="text-white text-sm font-medium">
-              <%= currentUser.username %> <span class="text-blue-100">(<%=  currentUser.role %>)</span>
+            <span class="text-white text-xs lg:text-sm font-medium truncate max-w-xs">
+              <%= currentUser.username %> <span class="hidden sm:inline text-blue-100">(<%=  currentUser.role %>)</span>
             </span>
             <form method="post" action="/logout" class="inline">
-              <button class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">退出</button>
+              <button class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm transition">退出</button>
             </form>
             <% } else { %>
-            <a href="/login" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">登录</a>
-            <a href="/register" class="text-white hover:bg-blue-700 px-3 py-2 rounded-lg transition">注册</a>
+            <a href="/login" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm transition">登录</a>
+            <a href="/register" class="text-white hover:bg-blue-700 px-2 lg:px-3 py-2 rounded-lg text-sm transition">注册</a>
             <% } %>
           </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="md:hidden hidden pb-4 pt-2 space-y-1">
+          <% if (currentUser && currentUser.role === 'student') { %>
+          <a href="/student/jobs" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">岗位列表</a>
+          <a href="/student/applications" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">投递记录</a>
+          <a href="/student/profile" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">个人信息</a>
+          <% } else if (currentUser && currentUser.role === 'company') { %>
+          <a href="/company/jobs" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">岗位管理</a>
+          <a href="/company/applications" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">投递学生</a>
+          <% } else if (currentUser && currentUser.role === 'admin') { %>
+          <a href="/admin/dashboard" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">统计面板</a>
+          <a href="/admin/applications" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">投递审核</a>
+          <a href="/admin/jobs" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">岗位管理</a>
+          <a href="/admin/students" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">简历库</a>
+          <% } %>
+          <hr class="border-blue-700/30 my-2">
+          <% if (currentUser) { %>
+          <div class="px-3 py-2 text-white text-sm">
+            <%= currentUser.username %> (<%=  currentUser.role %>)
+          </div>
+          <form method="post" action="/logout" class="px-3">
+            <button class="w-full text-left text-white hover:bg-blue-700/50 px-3 py-2 rounded-lg text-base">退出</button>
+          </form>
+          <% } else { %>
+          <a href="/login" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">登录</a>
+          <a href="/register" class="text-white hover:bg-blue-700/50 block px-3 py-2 rounded-lg text-base">注册</a>
+          <% } %>
         </div>
       </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+    <main class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8 min-h-screen">
       <%- body %>
     </main>
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-300 mt-12 py-6 border-t-2 border-gray-800">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p>&copy; 2026 校企合作投递系统 | ALL RIGHTS RESERVED | 对系统的改进建议或bug请联系 mirmonsjackey@gmail.com</p>
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 text-center text-xs sm:text-sm">
+        <p>&copy; 2026 校企合作投递系统 | ALL RIGHTS RESERVED</p>
+        <p class="text-xs mt-2">联系: mirmonsjackey@gmail.com</p>
       </div>
     </footer>
+
+    <script>
+      // 移动菜单切换
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+          mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 点击菜单项后关闭菜单
+        mobileMenu.querySelectorAll('a, button').forEach(item => {
+          item.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+          });
+        });
+      }
+    </script>
   </body>
 </html>
 

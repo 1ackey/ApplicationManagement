@@ -1,4 +1,4 @@
-## 校企合作实习投递系统（快速版）
+## 校企合作投递系统
 
 **技术栈：** Node.js + Express + SQLite + EJS + Bootstrap  
 **功能：** 学生投递简历、企业发布岗位并查看投递、管理员审核投递与查看统计。
@@ -16,11 +16,15 @@ npm install
 ```bash
 npm run dev
 ```
-
 或生产模式：
 
 ```bash
 npm start
+```
+
+下面命令会重置数据库，系统完全重置
+```bash
+npm run reset-db
 ```
 
 3. 浏览器访问：`http://localhost:3000`
@@ -54,6 +58,4 @@ npm start
 
 - `GET /api/jobs`：岗位列表（只返回 visible 岗位）
 - `GET /api/jobs/:id`：岗位详情
-
-你可以在此基础上继续补充 `application`、`student`、`admin` 相关 API。
 

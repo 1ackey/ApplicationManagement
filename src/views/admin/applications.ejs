@@ -1,60 +1,74 @@
-<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+<div class="max-w-6xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
   <!-- Header -->
-  <div style="margin-bottom: 30px;">
-    <h1 style="font-size: 28px; font-weight: bold; color: #111; margin: 0 0 8px 0;">✅ 投递审核</h1>
-    <p style="color: #666; margin: 0;">审核学生投递的岗位申请</p>
+  <div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">✅ 投递审核</h1>
+    <p class="text-sm text-gray-500 mt-1 sm:mt-2">审核学生投递的岗位申请</p>
   </div>
 
   <% if (applications.length === 0) { %>
   <!-- Empty State -->
-  <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 40px; text-align: center;">
-    <p style="font-size: 48px; margin: 0 0 10px 0;">✨</p>
-    <h3 style="font-size: 18px; font-weight: bold; color: #111; margin: 0 0 5px 0;">暂无投递</h3>
-    <p style="color: #666; margin: 0;">所有投递都已处理</p>
+  <div class="bg-white border border-gray-100 rounded-lg sm:rounded-xl shadow-sm p-8 sm:p-12 text-center">
+    <p class="text-4xl sm:text-5xl mb-4">✨</p>
+    <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-1">暂无投递</h3>
+    <p class="text-sm text-gray-500">所有投递都已处理</p>
   </div>
   <% } else { %>
-  <!-- Applications Table -->
-  <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
-    <div style="overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse;">
+  
+  <!-- Desktop Table View -->
+  <div class="hidden md:block bg-white border border-gray-100 rounded-lg lg:rounded-xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
         <thead>
-          <tr style="background: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
-            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 20%;">岗位</th>
-            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 15%;">学生姓名</th>
-            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 20%;">投递时间</th>
-            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 15%;">状态</th>
-            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 30%;">操作</th>
+          <tr class="bg-gray-50/50 border-b border-gray-100">
+            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">岗位</th>
+            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">学生姓名</th>
+            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">投递时间</th>
+            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">状态</th>
+            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">操作</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-gray-100">
           <% applications.forEach(function(app, idx){ %>
-          <tr style="border-bottom: 1px solid #e5e7eb; background: <%= idx % 2 === 0 ? 'white' : '#f9fafb' %>;">
-            <td style="padding: 12px; color: #1f2937; font-weight: 500;"><%= app.title %></td>
-            <td style="padding: 12px; color: #4b5563;"><%= app.name || '未填写' %></td>
-            <td style="padding: 12px; color: #666; font-size: 12px;"><%= new Date(app.created_at).toLocaleDateString('zh-CN') %></td>
-            <td style="padding: 12px;">
+          <tr class="hover:bg-gray-50/50 transition-colors duration-150">
+            <td class="px-6 py-5 text-sm font-medium text-gray-900"><%= app.title %></td>
+            <td class="px-6 py-5 text-sm text-gray-600"><%= app.name || '未填写' %></td>
+            <td class="px-6 py-5 text-xs text-gray-500 tabular-nums"><%= new Date(app.created_at).toLocaleDateString('zh-CN') %></td>
+            <td class="px-6 py-5">
               <% if (app.status === 'pending') { %>
-              <span style="background: #e5e7eb; color: #374151; padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;">⏳ 待审核</span>
+              <span class="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200 rounded-full">
+                <span class="w-2 h-2 bg-amber-400 rounded-full mr-2 animate-pulse"></span>
+                待审核
+              </span>
               <% } else if (app.status === 'approved') { %>
-              <span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;">✅ 已通过</span>
+              <span class="inline-flex items-center px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 rounded-full">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
+                已通过
+              </span>
               <% } else if (app.status === 'rejected') { %>
-              <span style="background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;">❌ 已拒绝</span>
+              <span class="inline-flex items-center px-3 py-1 bg-rose-50 text-rose-700 text-xs font-semibold border border-rose-200 rounded-full">
+                <span class="w-2 h-2 bg-rose-500 rounded-full mr-2"></span>
+                已拒绝
+              </span>
               <% } %>
             </td>
-            <td style="padding: 12px;">
+            <td class="px-6 py-5">
               <% if (app.status === 'pending') { %>
-              <div style="display: flex; gap: 8px;">
-                <form method="post" action="/admin/applications/<%= app.id %>/review" style="display: inline;">
+              <div class="flex gap-2">
+                <form method="post" action="/admin/applications/<%= app.id %>/review" class="inline">
                   <input type="hidden" name="status" value="approved" />
-                  <button style="padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; background: #10b981; color: white;">✅ 通过</button>
+                  <button class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors">
+                    ✅ 通过
+                  </button>
                 </form>
-                <form method="post" action="/admin/applications/<%= app.id %>/review" style="display: inline;">
+                <form method="post" action="/admin/applications/<%= app.id %>/review" class="inline">
                   <input type="hidden" name="status" value="rejected" />
-                  <button style="padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; background: #ef4444; color: white;">❌ 拒绝</button>
+                  <button class="inline-flex items-center px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg transition-colors">
+                    ❌ 拒绝
+                  </button>
                 </form>
               </div>
               <% } else { %>
-              <span style="color: #999; font-size: 12px;">已处理</span>
+              <span class="text-xs text-gray-500">已处理</span>
               <% } %>
             </td>
           </tr>
@@ -63,6 +77,59 @@
       </table>
     </div>
   </div>
+
+  <!-- Mobile Card View -->
+  <div class="md:hidden space-y-3">
+    <% applications.forEach(function(app){ %>
+    <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4">
+      <div class="mb-3">
+        <h3 class="text-base font-semibold text-gray-900 break-words mb-1"><%= app.title %></h3>
+        <p class="text-sm text-gray-600"><%= app.name || '未填写' %></p>
+        <p class="text-xs text-gray-500 mt-1">投递时间：<%= new Date(app.created_at).toLocaleDateString('zh-CN') %></p>
+      </div>
+
+      <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+        <p class="text-xs font-semibold text-gray-500 uppercase">状态</p>
+        <% if (app.status === 'pending') { %>
+        <span class="inline-flex items-center px-2 py-1 bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200 rounded-full">
+          <span class="w-1.5 h-1.5 bg-amber-400 rounded-full mr-1.5 animate-pulse"></span>
+          待审核
+        </span>
+        <% } else if (app.status === 'approved') { %>
+        <span class="inline-flex items-center px-2 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 rounded-full">
+          <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5"></span>
+          已通过
+        </span>
+        <% } else if (app.status === 'rejected') { %>
+        <span class="inline-flex items-center px-2 py-1 bg-rose-50 text-rose-700 text-xs font-semibold border border-rose-200 rounded-full">
+          <span class="w-1.5 h-1.5 bg-rose-500 rounded-full mr-1.5"></span>
+          已拒绝
+        </span>
+        <% } %>
+      </div>
+
+      <% if (app.status === 'pending') { %>
+      <div class="flex gap-2">
+        <form method="post" action="/admin/applications/<%= app.id %>/review" class="flex-1">
+          <input type="hidden" name="status" value="approved" />
+          <button class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors">
+            ✅ 通过
+          </button>
+        </form>
+        <form method="post" action="/admin/applications/<%= app.id %>/review" class="flex-1">
+          <input type="hidden" name="status" value="rejected" />
+          <button class="w-full py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-lg transition-colors">
+            ❌ 拒绝
+          </button>
+        </form>
+      </div>
+      <% } else { %>
+      <p class="text-center text-sm text-gray-500 py-2">已处理，无法更改</p>
+      <% } %>
+    </div>
+    <% }) %>
+  </div>
+
   <% } %>
 </div>
 
