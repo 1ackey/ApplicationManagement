@@ -144,5 +144,147 @@ router.get('/students', (req, res) => {
   );
 });
 
+// 账号管理
+// 显示所有账号列表（除了自己）
+router.get('/users', (req, res) => {
+  const adminId = req.session.user.id;
+  db.all(
+    'SELECT id, username, role, created_at FROM users WHERE id != ? ORDER BY created_at DESC',
+    [adminId],
+    (err, users) => {
+      if (err)
+        return res.render('error', { message: '加载账号失败' });
+      res.render('admin/users', { users, currentUserId: adminId });
+    }
+  );
+});
+
+// 显示创建账号表单
+router.get('/users/new', (req, res) => {
+  res.render('admin/users-form', { user: null, isEdit: false, error: null });
+});
+
+// 创建新账号
+router.post('/users', (req, res) => {
+  const { username, password, role } = req.body;
+  if (!['student', 'company', 'admin'].includes(role)) {
+    return res.render('admin/users-form', { 
+      user: { username, role }, 
+      isEdit: false,
+      error: '角色选择错误' 
+    });
+  }
+  if (!username || !password) {
+    return res.render('admin/users-form', { 
+      user: { username, role }, 
+      isEdit: false,
+      error: '用户名和密码不能为空' 
+    });
+  }
+  
+  const bcrypt = require('bcryptjs');
+  const hash = bcrypt.hashSync(password, 10);
+  db.run(
+    'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
+    [username, hash, role],
+    function (err) {
+      if (err) {
+        return res.render('admin/users-form', { 
+          user: { username, role }, 
+          isEdit: false,
+          error: '用户名已存在或系统错误' 
+        });
+      }
+      // 为学生和公司账号创建对应资料
+      if (role === 'student') {
+        db.run(
+          'INSERT INTO student_profile (user_id, name) VALUES (?, ?)',
+          [this.lastID, username]
+        );
+      } else if (role === 'company') {
+        db.run(
+          'INSERT INTO company (user_id, company_name) VALUES (?, ?)',
+          [this.lastID, username]
+        );
+      }
+      res.redirect('/admin/users');
+    }
+  );
+});
+
+// 显示编辑账号表单
+router.get('/users/:id/edit', (req, res) => {
+  const userId = req.params.id;
+  const adminId = req.session.user.id;
+  
+  // 不能编辑自己
+  if (parseInt(userId) === adminId) {
+    return res.render('error', { message: '不能编辑自己的账号' });
+  }
+  
+  db.get('SELECT id, username, role FROM users WHERE id = ?', [userId], (err, user) => {
+    if (err || !user)
+      return res.render('error', { message: '账号不存在' });
+    res.render('admin/users-form', { user, isEdit: true, error: null });
+  });
+});
+
+// 更新账号信息
+router.post('/users/:id', (req, res) => {
+  const userId = req.params.id;
+  const adminId = req.session.user.id;
+  const { username, role } = req.body;
+  
+  // 不能编辑自己
+  if (parseInt(userId) === adminId) {
+    return res.render('error', { message: '不能编辑自己的账号' });
+  }
+  
+  if (!['student', 'company', 'admin'].includes(role)) {
+    return res.render('error', { message: '角色选择错误' });
+  }
+  
+  db.run(
+    'UPDATE users SET username = ?, role = ? WHERE id = ?',
+    [username, role, userId],
+    (err) => {
+      if (err)
+        return res.render('error', { message: '更新账号失败' });
+      res.redirect('/admin/users');
+    }
+  );
+});
+
+// 删除账号
+router.post('/users/:id/delete', (req, res) => {
+  const userId = req.params.id;
+  const adminId = req.session.user.id;
+  
+  // 不能删除自己
+  if (parseInt(userId) === adminId) {
+    return res.render('error', { message: '不能删除自己的账号' });
+  }
+  
+  // 获取用户信息以确定要删除的相关数据
+  db.get('SELECT role FROM users WHERE id = ?', [userId], (err, user) => {
+    if (err || !user)
+      return res.render('error', { message: '账号不存在' });
+    
+    // 删除相关的个人资料数据
+    if (user.role === 'student') {
+      db.run('DELETE FROM student_profile WHERE user_id = ?', [userId]);
+    } else if (user.role === 'company') {
+      db.run('DELETE FROM company WHERE user_id = ?', [userId]);
+    }
+    
+    // 删除用户账号
+    db.run('DELETE FROM users WHERE id = ?', [userId], (err) => {
+      if (err)
+        return res.render('error', { message: '删除账号失败' });
+      res.redirect('/admin/users');
+    });
+  });
+});
+
 module.exports = router;
 

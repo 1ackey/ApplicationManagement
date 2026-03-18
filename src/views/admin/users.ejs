@@ -1,0 +1,103 @@
+<div class="space-y-4 sm:space-y-6">
+  <!-- 页面标题和操作按钮 -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
+    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900">账号管理</h1>
+    <a href="/admin/users/new" class="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm sm:text-base w-full sm:w-auto">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      新建账号
+    </a>
+  </div>
+
+  <!-- 用户列表 -->
+  <div class="bg-white rounded-lg sm:rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <!-- 桌面版表格 -->
+    <div class="hidden md:block overflow-x-auto">
+      <table class="w-full text-sm lg:text-base">
+        <thead class="bg-slate-50 border-b border-slate-200">
+          <tr>
+            <th class="px-4 lg:px-6 py-3 lg:py-4 text-left font-semibold text-slate-700">用户名</th>
+            <th class="px-4 lg:px-6 py-3 lg:py-4 text-left font-semibold text-slate-700">角色</th>
+            <th class="px-4 lg:px-6 py-3 lg:py-4 text-left font-semibold text-slate-700">创建时间</th>
+            <th class="px-4 lg:px-6 py-3 lg:py-4 text-left font-semibold text-slate-700">操作</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          <% users.forEach(user => { %>
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 lg:px-6 py-3 lg:py-4 text-slate-900 font-medium"><%= user.username %></td>
+            <td class="px-4 lg:px-6 py-3 lg:py-4">
+              <% if (user.role === 'student') { %>
+                <span class="inline-flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-blue-100 text-blue-800">学生</span>
+              <% } else if (user.role === 'company') { %>
+                <span class="inline-flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-green-100 text-green-800">公司</span>
+              <% } else if (user.role === 'admin') { %>
+                <span class="inline-flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-purple-100 text-purple-800">管理员</span>
+              <% } %>
+            </td>
+            <td class="px-4 lg:px-6 py-3 lg:py-4 text-slate-600 text-xs sm:text-sm"><%= new Date(user.created_at).toLocaleDateString('zh-CN') %></td>
+            <td class="px-4 lg:px-6 py-3 lg:py-4 space-x-2">
+              <a href="/admin/users/<%= user.id %>/edit" class="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-amber-100 text-amber-800 rounded text-xs sm:text-sm font-medium hover:bg-amber-200 transition">
+                编辑
+              </a>
+              <form method="post" action="/admin/users/<%= user.id %>/delete" class="inline" onsubmit="return confirm('确定删除此账号吗？');">
+                <button type="submit" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-red-100 text-red-800 rounded text-xs sm:text-sm font-medium hover:bg-red-200 transition">
+                  删除
+                </button>
+              </form>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 手机版卡片视图 -->
+    <div class="md:hidden space-y-3 p-3 sm:p-4">
+      <% if (users.length === 0) { %>
+        <div class="text-center py-8 text-slate-500">
+          <p class="text-sm sm:text-base">暂无其他账号</p>
+        </div>
+      <% } else { %>
+        <% users.forEach(user => { %>
+        <div class="border border-slate-200 rounded-lg p-3 sm:p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+            <div>
+              <p class="font-semibold text-slate-900 text-base sm:text-lg"><%= user.username %></p>
+              <p class="text-xs sm:text-sm text-slate-600"><%= new Date(user.created_at).toLocaleDateString('zh-CN') %></p>
+            </div>
+            <% if (user.role === 'student') { %>
+              <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-100 text-blue-800 whitespace-nowrap">学生</span>
+            <% } else if (user.role === 'company') { %>
+              <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-green-100 text-green-800 whitespace-nowrap">公司</span>
+            <% } else if (user.role === 'admin') { %>
+              <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-purple-100 text-purple-800 whitespace-nowrap">管理员</span>
+            <% } %>
+          </div>
+          <div class="flex gap-2">
+            <a href="/admin/users/<%= user.id %>/edit" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-amber-100 text-amber-800 rounded text-xs sm:text-sm font-medium hover:bg-amber-200 transition">
+              编辑
+            </a>
+            <form method="post" action="/admin/users/<%= user.id %>/delete" class="flex-1" onsubmit="return confirm('确定删除此账号吗？');">
+              <button type="submit" class="w-full px-3 py-2 bg-red-100 text-red-800 rounded text-xs sm:text-sm font-medium hover:bg-red-200 transition">
+                删除
+              </button>
+            </form>
+          </div>
+        </div>
+        <% }); %>
+      <% } %>
+    </div>
+
+    <!-- 空状态提示 -->
+    <% if (users.length === 0) { %>
+    <div class="hidden md:block text-center py-12 px-4">
+      <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0z"></path>
+      </svg>
+      <p class="text-slate-500">暂无其他账号</p>
+    </div>
+    <% } %>
+  </div>
+</div>

@@ -1,0 +1,118 @@
+<div class="space-y-4 sm:space-y-6">
+  <!-- 页面标题 -->
+  <div class="flex items-center gap-3 sm:gap-4">
+    <a href="/admin/users" class="text-blue-600 hover:text-blue-700 transition">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+    </a>
+    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900">
+      <% if (isEdit) { %>编辑账号<% } else { %>新建账号<% } %>
+    </h1>
+  </div>
+
+  <!-- 表单卡片 -->
+  <div class="bg-white rounded-lg sm:rounded-xl border border-slate-200 shadow-sm">
+    <div class="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <!-- 错误提示 -->
+      <% if (error) { %>
+      <div class="rounded-lg border border-red-200 bg-red-50 px-4 sm:px-6 py-3 sm:py-4 text-sm text-red-700 mb-6 flex items-start gap-3">
+        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+        </svg>
+        <span><%= error %></span>
+      </div>
+      <% } %>
+
+      <!-- 表单 -->
+      <form method="post" action="<% if (isEdit) { %>/admin/users/<%= user.id %><% } else { %>/admin/users<% } %>" class="space-y-5 sm:space-y-6">
+        <!-- 用户名 -->
+        <div>
+          <label class="block text-sm sm:text-base font-semibold text-slate-900 mb-2">用户名 <span class="text-red-600">*</span></label>
+          <input
+            type="text"
+            name="username"
+            required
+            value="<%= user ? user.username : '' %>"
+            placeholder="请输入用户名"
+            class="w-full rounded-lg border border-slate-300 px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base
+                   placeholder-slate-400
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                   transition-all duration-200 ease-in-out"
+          />
+        </div>
+
+        <!-- 密码 (新建时必填，编辑时可选) -->
+        <% if (!isEdit) { %>
+        <div>
+          <label class="block text-sm sm:text-base font-semibold text-slate-900 mb-2">密码 <span class="text-red-600">*</span></label>
+          <input
+            type="password"
+            name="password"
+            required
+            placeholder="请输入密码（至少6位）"
+            class="w-full rounded-lg border border-slate-300 px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base
+                   placeholder-slate-400
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                   transition-all duration-200 ease-in-out"
+          />
+          <p class="mt-2 text-xs sm:text-sm text-slate-600">密码应至少包含6个字符</p>
+        </div>
+        <% } %>
+
+        <!-- 角色选择 -->
+        <div>
+          <label class="block text-sm sm:text-base font-semibold text-slate-900 mb-2">角色 <span class="text-red-600">*</span></label>
+          <select
+            name="role"
+            required
+            class="w-full rounded-lg border border-slate-300 px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base bg-white
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                   transition-all duration-200 ease-in-out"
+          >
+            <option value="">-- 请选择角色 --</option>
+            <option value="student" <% if (user && user.role === 'student') { %>selected<% } %>>学生</option>
+            <option value="company" <% if (user && user.role === 'company') { %>selected<% } %>>公司</option>
+            <option value="admin" <% if (user && user.role === 'admin') { %>selected<% } %>>管理员</option>
+          </select>
+          <p class="mt-2 text-xs sm:text-sm text-slate-600">创建对应角色的账号，系统会自动创建相关资料</p>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6">
+          <button
+            type="submit"
+            class="flex-1 inline-flex items-center justify-center px-6 py-2.5 sm:py-3
+                   rounded-lg text-sm sm:text-base font-semibold
+                   bg-blue-600 text-white
+                   hover:bg-blue-700
+                   active:bg-blue-800 active:scale-95
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                   transition-all duration-200 ease-in-out"
+          >
+            <% if (isEdit) { %>保存修改<% } else { %>创建账号<% } %>
+          </button>
+          <a
+            href="/admin/users"
+            class="flex-1 inline-flex items-center justify-center px-6 py-2.5 sm:py-3
+                   rounded-lg text-sm sm:text-base font-semibold
+                   bg-slate-200 text-slate-700
+                   hover:bg-slate-300
+                   transition-all duration-200 ease-in-out"
+          >
+            取消
+          </a>
+        </div>
+      </form>
+
+      <!-- 提示信息 -->
+      <% if (!isEdit) { %>
+      <div class="mt-6 sm:mt-8 p-4 sm:p-5 bg-blue-50 border border-blue-200 rounded-lg">
+        <p class="text-xs sm:text-sm text-blue-800">
+          <strong>提示：</strong>创建学生或公司账号时，系统会自动创建对应的个人资料。创建管理员账号后需要手动配置权限。
+        </p>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
