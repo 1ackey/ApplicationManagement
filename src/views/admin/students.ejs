@@ -1,113 +1,265 @@
 <div class="max-w-6xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
   <!-- Header -->
   <div class="mb-6 sm:mb-8">
-    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">📚 学生简历库</h1>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">学生简历库</h1>
     <p class="text-sm text-gray-500 mt-1 sm:mt-2">全部学生的信息和简历</p>
+  </div>
+
+  <!-- 筛选栏 -->
+  <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+      <!-- 学号筛选 -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">学号</label>
+        <input type="text" id="filterUsername" placeholder="输入学号" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <!-- 姓名筛选 -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">姓名</label>
+        <input type="text" id="filterName" placeholder="输入姓名" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <!-- 状态筛选 -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">简历状态</label>
+        <select id="filterStatus" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="all">全部</option>
+          <option value="completed">已完成</option>
+          <option value="incomplete">未完成</option>
+        </select>
+      </div>
+      <!-- 重置按钮 -->
+      <div>
+        <button id="resetFilters" class="w-full sm:w-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-lg transition-colors">
+          重置筛选
+        </button>
+      </div>
+      <!-- 下载按钮 -->
+      <div>
+        <button id="downloadResumes" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:sbg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
+          下载筛选简历
+        </button>
+      </div>
+    </div>
   </div>
 
   <% if (students.length === 0) { %>
   <!-- Empty State -->
   <div class="bg-white border border-gray-100 rounded-lg sm:rounded-xl shadow-sm p-8 sm:p-12 text-center">
-    <p class="text-4xl sm:text-5xl mb-4">👥</p>
     <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-1">暂无学生</h3>
     <p class="text-sm text-gray-500">还没有学生注册</p>
   </div>
   <% } else { %>
   
+  <!-- 筛选结果提示（可选） -->
+  <div id="filterResultMessage" class="text-sm text-gray-500 mb-3 hidden"></div>
+
   <!-- Desktop Table View -->
   <div class="hidden md:block bg-white border border-gray-100 rounded-lg lg:rounded-xl shadow-sm overflow-hidden mb-8">
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead>
           <tr class="bg-gray-50/50 border-b border-gray-100">
-            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">用户名</th>
+            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">学号</th>
             <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">姓名</th>
             <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">简历</th>
             <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">状态</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
-          <% students.forEach(function(s){ %>
-          <tr class="hover:bg-gray-50/50 transition-colors duration-150">
-            <td class="px-6 py-5">
-              <span class="inline-flex px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full"><%= s.username %></span>
-            </td>
-            <td class="px-6 py-5 text-sm font-medium text-gray-900"><%= s.name || '-' %></td>
-            <td class="px-6 py-5">
-              <% if (s.resume_url) { %>
-              <a href="<%= s.resume_url %>" target="_blank" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                查看简历
-              </a>
-              <% } else { %>
-              <span class="text-xs text-gray-500">暂无</span>
-              <% } %>
-            </td>
-            <td class="px-6 py-5 text-center">
-              <% if (s.resume_url) { %>
-              <span class="inline-flex items-center px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 rounded-full">
-                ✅ 已完成
-              </span>
-              <% } else { %>
-              <span class="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200 rounded-full">
-                ⏳ 未完成
-              </span>
-              <% } %>
-            </td>
-          </tr>
-          <% }) %>
+        <tbody id="studentTableBody" class="divide-y divide-gray-100">
+          <!-- 动态渲染 -->
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- Mobile Card View -->
-  <div class="md:hidden space-y-3 mb-8">
-    <% students.forEach(function(s){ %>
-    <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4">
-      <div class="mb-3">
-        <span class="inline-flex px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full"><%= s.username %></span>
-        <p class="text-base font-semibold text-gray-900 mt-2"><%= s.name || '-' %></p>
-      </div>
-
-      <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
-        <p class="text-xs font-semibold text-gray-500 uppercase">状态</p>
-        <% if (s.resume_url) { %>
-        <span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 rounded-full">
-          ✅ 已完成
-        </span>
-        <% } else { %>
-        <span class="inline-flex items-center px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200 rounded-full">
-          ⏳ 未完成
-        </span>
-        <% } %>
-      </div>
-
-      <% if (s.resume_url) { %>
-      <a href="<%= s.resume_url %>" target="_blank" class="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-        查看简历
-      </a>
-      <% } %>
-    </div>
-    <% }) %>
+  <div id="studentCardsContainer" class="md:hidden space-y-3 mb-8">
+    <!-- 动态渲染 -->
   </div>
 
-  <!-- Summary Stats -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-    <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4 sm:p-6 text-center">
-      <p class="text-xs sm:text-sm text-gray-500 font-semibold mb-2">总学生数</p>
-      <p class="text-3xl sm:text-4xl font-bold text-blue-600"><%= students.length %></p>
-    </div>
-    <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4 sm:p-6 text-center">
-      <p class="text-xs sm:text-sm text-gray-500 font-semibold mb-2">已上传简历</p>
-      <p class="text-3xl sm:text-4xl font-bold text-emerald-600"><%= students.filter(s => s.resume_url).length %></p>
-    </div>
-    <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4 sm:p-6 text-center">
-      <p class="text-xs sm:text-sm text-gray-500 font-semibold mb-2">未上传简历</p>
-      <p class="text-3xl sm:text-4xl font-bold text-amber-600"><%= students.filter(s => !s.resume_url).length %></p>
-    </div>
+  <!-- Summary Stats (动态更新) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4" id="statsContainer">
+    <!-- 动态渲染 -->
   </div>
   <% } %>
 </div>
 
+<script>
+  // 获取原始学生数据（从服务器端注入到前端）
+  const studentsData = <%- JSON.stringify(students) %>;
+
+  // DOM 元素
+  const filterUsername = document.getElementById('filterUsername');
+  const filterName = document.getElementById('filterName');
+  const filterStatus = document.getElementById('filterStatus');
+  const resetBtn = document.getElementById('resetFilters');
+  const tableBody = document.getElementById('studentTableBody');
+  const cardsContainer = document.getElementById('studentCardsContainer');
+  const statsContainer = document.getElementById('statsContainer');
+  const filterMessage = document.getElementById('filterResultMessage');
+
+  // 辅助函数：渲染所有内容（表格、卡片、统计）
+  function render(filteredStudents) {
+    // 更新统计
+    const total = filteredStudents.length;
+    const completed = filteredStudents.filter(s => s.resume_url).length;
+    const incomplete = total - completed;
+    
+    statsContainer.innerHTML = `
+      <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4 sm:p-6 text-center">
+        <p class="text-xs sm:text-sm text-gray-500 font-semibold mb-2">总学生数</p>
+        <p class="text-3xl sm:text-4xl font-bold text-blue-600">${total}</p>
+      </div>
+      <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4 sm:p-6 text-center">
+        <p class="text-xs sm:text-sm text-gray-500 font-semibold mb-2">已上传简历</p>
+        <p class="text-3xl sm:text-4xl font-bold text-emerald-600">${completed}</p>
+      </div>
+      <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4 sm:p-6 text-center">
+        <p class="text-xs sm:text-sm text-gray-500 font-semibold mb-2">未上传简历</p>
+        <p class="text-3xl sm:text-4xl font-bold text-amber-600">${incomplete}</p>
+      </div>
+    `;
+
+    // 显示筛选结果提示
+    if (filteredStudents.length === studentsData.length) {
+      filterMessage.classList.add('hidden');
+    } else {
+      filterMessage.classList.remove('hidden');
+      filterMessage.textContent = `找到 ${filteredStudents.length} 名学生（共 ${studentsData.length} 名）`;
+    }
+
+    // 渲染表格
+    if (tableBody) {
+      if (filteredStudents.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-gray-500">没有匹配的学生</td></tr>`;
+      } else {
+        tableBody.innerHTML = filteredStudents.map(s => `
+          <tr class="hover:bg-gray-50/50 transition-colors duration-150">
+            <td class="px-6 py-5">
+              <span class="inline-flex px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">${escapeHtml(s.username)}</span>
+            </td>
+            <td class="px-6 py-5 text-sm font-medium text-gray-900">${escapeHtml(s.name || '-')}</td>
+            <td class="px-6 py-5">
+              ${s.resume_url ? `<a href="${escapeHtml(s.resume_url)}" target="_blank" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                查看简历
+              </a>` : `<span class="text-xs text-gray-500">暂无</span>`}
+            </td>
+            <td class="px-6 py-5 text-center">
+              ${s.resume_url ? 
+                `<span class="inline-flex items-center px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 rounded-full">✅ 已完成</span>` : 
+                `<span class="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200 rounded-full">⏳ 未完成</span>`
+              }
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // 渲染移动卡片
+    if (cardsContainer) {
+      if (filteredStudents.length === 0) {
+        cardsContainer.innerHTML = `<div class="bg-white border border-gray-100 rounded-lg shadow-sm p-8 text-center text-gray-500">没有匹配的学生</div>`;
+      } else {
+        cardsContainer.innerHTML = filteredStudents.map(s => `
+          <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4">
+            <div class="mb-3">
+              <span class="inline-flex px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">${escapeHtml(s.username)}</span>
+              <p class="text-base font-semibold text-gray-900 mt-2">${escapeHtml(s.name || '-')}</p>
+            </div>
+            <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+              <p class="text-xs font-semibold text-gray-500 uppercase">状态</p>
+              ${s.resume_url ? 
+                `<span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 rounded-full">✅ 已完成</span>` : 
+                `<span class="inline-flex items-center px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200 rounded-full">⏳ 未完成</span>`
+              }
+            </div>
+            ${s.resume_url ? `
+              <a href="${escapeHtml(s.resume_url)}" target="_blank" class="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                查看简历
+              </a>
+            ` : ''}
+          </div>
+        `).join('');
+      }
+    }
+  }
+
+  // 筛选逻辑
+  function applyFilters() {
+    const usernameQuery = filterUsername.value.trim().toLowerCase();
+    const nameQuery = filterName.value.trim().toLowerCase();
+    const statusValue = filterStatus.value;
+
+    const filtered = studentsData.filter(student => {
+      // 学号匹配
+      if (usernameQuery && !student.username.toLowerCase().includes(usernameQuery)) return false;
+      // 姓名匹配
+      if (nameQuery && (!student.name || !student.name.toLowerCase().includes(nameQuery))) return false;
+      // 状态匹配
+      if (statusValue === 'completed' && !student.resume_url) return false;
+      if (statusValue === 'incomplete' && student.resume_url) return false;
+      return true;
+    });
+
+    render(filtered);
+  }
+
+  // 重置筛选
+  function resetFilters() {
+    filterUsername.value = '';
+    filterName.value = '';
+    filterStatus.value = 'all';
+    applyFilters();
+  }
+
+  // 简单的防XSS辅助函数
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+      return c;
+    });
+  }
+
+  // 绑定事件
+  filterUsername.addEventListener('input', applyFilters);
+  filterName.addEventListener('input', applyFilters);
+  filterStatus.addEventListener('change', applyFilters);
+  if (resetBtn) resetBtn.addEventListener('click', resetFilters);
+
+  // 下载简历按钮
+  const downloadBtn = document.getElementById('downloadResumes');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/admin/students/download';
+
+      // 添加筛选参数
+      const addField = (name, value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      };
+
+      addField('username', filterUsername.value.trim());
+      addField('name', filterName.value.trim());
+      addField('status', filterStatus.value);
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+    });
+  }
+
+  // 初始渲染
+  render(studentsData);
+</script>

@@ -5,6 +5,21 @@
     <p style="color: var(--color-text-tertiary); font-size: 0.95rem;">审核学生投递的岗位申请，共 <span class="font-semibold" style="color: var(--color-text-secondary);"><%= applications.length %></span> 条</p>
   </div>
 
+  <% if (applications.length > 0) { %>
+  <!-- 批量操作按钮 -->
+  <div class="mb-6 sm:mb-8">
+    <form method="post" action="/admin/applications/bulk-approve" class="inline-block">
+      <button type="submit" class="px-6 py-3 font-semibold text-sm rounded-lg transition-all shadow-sm hover:shadow-md"
+        style="background-color: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-success-border); cursor: pointer;"
+        onmouseover="this.style.backgroundColor='rgba(16, 185, 129, 0.15)'"
+        onmouseout="this.style.backgroundColor='var(--color-success-bg)'"
+        onclick="return confirm('确定要通过所有待审核的投递吗？')">
+        ✓ 通过所有投递
+      </button>
+    </form>
+  </div>
+  <% } %>
+
   <% if (applications.length === 0) { %>
   <!-- 空状态 -->
   <div class="card p-12 text-center">
@@ -24,7 +39,8 @@
         <div class="col-span-4">
           <p style="color: var(--color-text-tertiary); font-size: 0.875rem; margin-bottom: 0.375rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">申请人</p>
           <p style="font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.5rem; font-size: 1.05rem;"><%= app.name || '未填写' %></p>
-          <p style="color: var(--color-text-secondary); font-size: 0.95rem;">岗位：<strong><%= app.title %></strong></p>
+          <p style="color: var(--color-text-secondary); font-size: 0.95rem;"><strong><%= app.title %></strong></p>
+          <p style="color: var(--color-text-secondary); font-size: 0.75rem;"><%= app.company_name %></p>
         </div>
 
         <!-- 中间：时间和标签 -->
@@ -36,7 +52,7 @@
           <% if (app.status === 'pending') { %>
           <span class="badge badge-warning">待审核</span>
           <% } else if (app.status === 'approved') { %>
-          <span class="badge badge-success">已录用</span>
+          <span class="badge badge-success">已通过</span>
           <% } else if (app.status === 'rejected') { %>
           <span class="badge badge-error">已拒绝</span>
           <% } %>
@@ -51,7 +67,7 @@
               style="background-color: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-success-border); cursor: pointer;"
               onmouseover="this.style.backgroundColor='rgba(16, 185, 129, 0.15)'"
               onmouseout="this.style.backgroundColor='var(--color-success-bg)'">
-              ✓ 录用
+              ✓ 通过
             </button>
           </form>
           <form method="post" action="/admin/applications/<%= app.id %>/review" class="inline">
@@ -96,7 +112,7 @@
         <% if (app.status === 'pending') { %>
         <span class="badge badge-warning">待审核</span>
         <% } else if (app.status === 'approved') { %>
-        <span class="badge badge-success">已录用</span>
+        <span class="badge badge-success">已通过</span>
         <% } else if (app.status === 'rejected') { %>
         <span class="badge badge-error">已拒绝</span>
         <% } %>
@@ -109,7 +125,7 @@
           <input type="hidden" name="status" value="approved" />
           <button type="submit" class="w-full px-4 py-3 font-semibold text-sm rounded-lg transition-all" 
             style="background-color: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-success-border); cursor: pointer;">
-            ✓ 录用
+            ✓ 通过
           </button>
         </form>
         <form method="post" action="/admin/applications/<%= app.id %>/review" class="flex-1">

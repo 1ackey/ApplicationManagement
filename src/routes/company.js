@@ -197,16 +197,22 @@ router.get('/jobs/:id/download-resumes', (req, res) => {
           const archive = archiver('zip', { zlib: { level: 9 } });
           const jobDate = new Date().toISOString().split('T')[0];
           const zipName = `${job.title}_简历_${jobDate}.zip`;
-          res.attachment(zipName);
+          const encodedZipName = encodeURIComponent(zipName);
+          res.setHeader('Content-Type', 'application/zip');
+          res.setHeader('Content-Disposition', `attachment; filename="${encodedZipName}"; filename*=UTF-8''${encodedZipName}`);
           archive.pipe(res);
           // 添加文件到ZIP
           rows.forEach((row) => {
             if (row.resume_url) {
               const filePath = path.join(__dirname, '..', '..', row.resume_url);
               if (fs.existsSync(filePath)) {
-                const fileName = path.basename(filePath);
-                const namePrefix = row.name ? `${row.name}_` : '';
-                archive.file(filePath, { name: `${namePrefix}${fileName}` });
+                // 1. 获取后缀名，例如 .pdf
+                const extension = path.extname(filePath); 
+                // 2. 构造新的文件名：学生姓名 + 后缀
+                // 如果没有名字则降级使用原文件名
+                const newFileName = row.name ? `${row.name}${extension}` : path.basename(filePath);
+                
+                archive.file(filePath, { name: newFileName });
               }
             }
           });

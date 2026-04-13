@@ -17,3 +17,4 @@ uploads/
 
 # 系统
 .DS_Store
+.vscode/
