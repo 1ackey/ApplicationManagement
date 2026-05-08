@@ -5,7 +5,7 @@
     <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">浏览并投递感兴趣的岗位</p>
   </div>
 
-  <% if (!jobs || jobs.length === 0) { %>
+  <% if (!companies || companies.length === 0) { %>
   <!-- Empty State -->
   <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm py-12 px-4 sm:px-8 text-center mx-2 sm:mx-0">
     <p class="text-4xl sm:text-5xl mb-4">🔍</p>
@@ -13,44 +13,72 @@
     <p class="text-sm sm:text-base text-slate-500">建议稍后再来查看</p>
   </div>
   <% } else { %>
-  <!-- Jobs Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 px-2 sm:px-0">
-    <% jobs.forEach(function(job){ %>
-    <div
-      class="bg-white rounded-lg sm:rounded-xl border border-slate-200/80 shadow-sm overflow-hidden
-             hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]
-             cursor-pointer transition-all duration-200 ease-in-out">
-      <a href="/student/jobs/<%= job.id %>" class="no-underline block px-3 sm:px-5 py-3 sm:py-4">
-          <!-- Company Badge -->
-          <div class="mb-2 sm:mb-3">
-            <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
-              🏢 <%= job.company_name %>
-            </span>
+  <!-- Companies Accordion -->
+  <div class="space-y-2 px-2 sm:px-0">
+    <% companies.forEach(function(company, index){ %>
+    <div class="bg-white border border-slate-200/80 rounded-lg overflow-hidden shadow-sm">
+      <!-- Company Header (Accordion Toggle) -->
+      <button
+        type="button"
+        class="company-toggle w-full px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between bg-gradient-to-r from-blue-50 to-transparent hover:from-blue-100/50 hover:to-blue-50/20 transition-colors duration-200"
+        onclick="toggleCompany(<%= index %>)"
+        data-company-index="<%= index %>"
+      >
+        <div class="flex items-center gap-3 sm:gap-4 flex-1 text-left min-w-0">
+          <span class="text-lg sm:text-xl font-bold text-blue-600 shrink-0">🏢</span>
+          <div class="min-w-0">
+            <h3 class="text-base sm:text-lg font-semibold text-gray-900 truncate">
+              <%= company.name %>
+            </h3>
+            <p class="text-xs sm:text-sm text-gray-500">
+              <%= company.jobs.length %> 个岗位
+            </p>
           </div>
+        </div>
 
-          <!-- Job Title -->
-          <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-1 sm:mb-2 line-clamp-2">
-            <%= job.title %>
-          </h3>
+        <!-- Expand/Collapse Arrow -->
+        <svg
+          class="company-arrow w-5 h-5 text-gray-400 transition-transform duration-200 shrink-0 ml-3 transform rotate-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
+      </button>
 
-          <!-- Job Description Preview -->
-          <p class="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3">
-            <%= (job.description || '暂无描述').substring(0, 80) %>
-          </p>
+      <!-- Jobs List (Collapsible) -->
+      <div class="company-content hidden border-t border-slate-100" data-company-index="<%= index %>">
+        <div class="bg-white/50 px-4 sm:px-6 py-4 space-y-3">
+          <% company.jobs.forEach(function(job){ %>
+          <a
+            href="/student/jobs/<%= job.id %>"
+            class="block bg-white border border-slate-100 rounded-lg p-4 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
+          >
+            <!-- Job Title -->
+            <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+              <%= job.title %>
+            </h4>
 
-          <!-- Footer -->
-          <div class="border-t border-gray-100 pt-2 sm:pt-4 mt-2 sm:mt-2 flex items-center justify-between text-xs sm:text-sm">
-            <span class="text-xs text-slate-400 truncate">
-              点击查看详情
-            </span>
-            <span class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200 whitespace-nowrap ml-2">
-              查看 
-              <svg class="w-3 sm:w-4 h-3 sm:h-4 ml-0.5 sm:ml-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-              </svg>
-            </span>
-          </div>
-      </a>
+            <!-- Job Description Preview -->
+            <p class="text-gray-600 text-sm mb-3 line-clamp-2">
+              <%= (job.description || '暂无描述').substring(0, 100) %>
+            </p>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+              <span class="text-xs text-slate-400">点击查看详情和投递</span>
+              <span class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold text-sm">
+                查看
+                <svg class="w-3.5 h-3.5 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </span>
+            </div>
+          </a>
+          <% }) %>
+        </div>
+      </div>
     </div>
     <% }) %>
   </div>
@@ -58,8 +86,31 @@
   <!-- Stats Section -->
   <div class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200 px-2 sm:px-0">
     <p class="text-center text-sm sm:text-base text-gray-600">
-      💼 共有 <span class="font-bold text-blue-600"><%= jobs.length %></span> 个岗位等你投递
+      💼 共有 <span class="font-bold text-blue-600"><%= totalJobs %></span> 个岗位等你投递
     </p>
   </div>
   <% } %>
 </div>
+
+<script>
+function toggleCompany(index) {
+  const content = document.querySelector(`.company-content[data-company-index="${index}"]`);
+  const arrow = document.querySelector(`.company-toggle[data-company-index="${index}"] .company-arrow`);
+
+  if (content.classList.contains('hidden')) {
+    content.classList.remove('hidden');
+    arrow.classList.add('rotate-180');
+  } else {
+    content.classList.add('hidden');
+    arrow.classList.remove('rotate-180');
+  }
+}
+
+// Expand first company by default on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const firstToggle = document.querySelector('.company-toggle[data-company-index="0"]');
+  if (firstToggle) {
+    toggleCompany(0);
+  }
+});
+</script>

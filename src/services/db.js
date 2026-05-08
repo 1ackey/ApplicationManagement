@@ -30,6 +30,7 @@ db.serialize(() => {
       name TEXT,
       school TEXT,
       major TEXT,
+      grade TEXT,
       resume_url TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id)
@@ -72,6 +73,24 @@ db.serialize(() => {
       FOREIGN KEY (student_id) REFERENCES student_profile(id)
     );
   `);
+
+  // 添加 grade 列（如果还不存在）
+  db.run(`
+    PRAGMA table_info(student_profile);
+  `, (err, rows) => {
+    if (!err) {
+      db.all('PRAGMA table_info(student_profile)', (err, cols) => {
+        const hasGrade = cols && cols.some(col => col.name === 'grade');
+        if (!hasGrade) {
+          db.run('ALTER TABLE student_profile ADD COLUMN grade TEXT', (err) => {
+            if (err && !err.message.includes('duplicate column name')) {
+              console.error('Error adding grade column:', err);
+            }
+          });
+        }
+      });
+    }
+  });
 });
 
 module.exports = { db };

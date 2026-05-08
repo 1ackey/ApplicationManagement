@@ -37,15 +37,30 @@ router.use(requireStudent);
 // 岗位列表（只显示 visible=1）
 router.get('/jobs', (req, res) => {
   db.all(
-    `SELECT job.*, company.company_name 
-     FROM job 
+    `SELECT job.*, company.company_name
+     FROM job
      JOIN company ON job.company_id = company.id
      WHERE job.visible = 1
-     ORDER BY job.created_at DESC`,
+     ORDER BY company.company_name ASC, job.created_at DESC`,
     [],
     (err, jobs) => {
       if (err) return res.render('error', { message: '加载岗位失败' });
-      res.render('student/jobs', { jobs });
+
+      // Group jobs by company
+      const companiesMap = {};
+      jobs.forEach(job => {
+        if (!companiesMap[job.company_name]) {
+          companiesMap[job.company_name] = [];
+        }
+        companiesMap[job.company_name].push(job);
+      });
+
+      const companies = Object.entries(companiesMap).map(([name, companyJobs]) => ({
+        name,
+        jobs: companyJobs
+      }));
+
+      res.render('student/jobs', { companies, totalJobs: jobs.length });
     }
   );
 });

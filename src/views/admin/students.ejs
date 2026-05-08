@@ -8,15 +8,15 @@
   <!-- 筛选栏 -->
   <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4 mb-6">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
-      <!-- 学号筛选 -->
-      <div>
-        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">学号</label>
-        <input type="text" id="filterUsername" placeholder="输入学号" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-      </div>
       <!-- 姓名筛选 -->
       <div>
         <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">姓名</label>
         <input type="text" id="filterName" placeholder="输入姓名" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <!-- 年级筛选 -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">年级</label>
+        <input type="text" id="filterGrade" placeholder="如: 本科2023级、研究生2024级" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
       </div>
       <!-- 状态筛选 -->
       <div>
@@ -35,7 +35,7 @@
       </div>
       <!-- 下载按钮 -->
       <div>
-        <button id="downloadResumes" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:sbg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
+        <button id="downloadResumes" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
           下载筛选简历
         </button>
       </div>
@@ -59,8 +59,8 @@
       <table class="w-full">
         <thead>
           <tr class="bg-gray-50/50 border-b border-gray-100">
-            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">学号</th>
             <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">姓名</th>
+            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">年级</th>
             <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">简历</th>
             <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">状态</th>
           </tr>
@@ -89,8 +89,8 @@
   const studentsData = <%- JSON.stringify(students) %>;
 
   // DOM 元素
-  const filterUsername = document.getElementById('filterUsername');
   const filterName = document.getElementById('filterName');
+  const filterGrade = document.getElementById('filterGrade');
   const filterStatus = document.getElementById('filterStatus');
   const resetBtn = document.getElementById('resetFilters');
   const tableBody = document.getElementById('studentTableBody');
@@ -104,7 +104,7 @@
     const total = filteredStudents.length;
     const completed = filteredStudents.filter(s => s.resume_url).length;
     const incomplete = total - completed;
-    
+
     statsContainer.innerHTML = `
       <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4 sm:p-6 text-center">
         <p class="text-xs sm:text-sm text-gray-500 font-semibold mb-2">总学生数</p>
@@ -135,10 +135,8 @@
       } else {
         tableBody.innerHTML = filteredStudents.map(s => `
           <tr class="hover:bg-gray-50/50 transition-colors duration-150">
-            <td class="px-6 py-5">
-              <span class="inline-flex px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">${escapeHtml(s.username)}</span>
-            </td>
             <td class="px-6 py-5 text-sm font-medium text-gray-900">${escapeHtml(s.name || '-')}</td>
+            <td class="px-6 py-5 text-sm text-gray-600">${escapeHtml(s.grade || '-')}</td>
             <td class="px-6 py-5">
               ${s.resume_url ? `<a href="${escapeHtml(s.resume_url)}" target="_blank" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
@@ -146,8 +144,8 @@
               </a>` : `<span class="text-xs text-gray-500">暂无</span>`}
             </td>
             <td class="px-6 py-5 text-center">
-              ${s.resume_url ? 
-                `<span class="inline-flex items-center px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 rounded-full">✅ 已完成</span>` : 
+              ${s.resume_url ?
+                `<span class="inline-flex items-center px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 rounded-full">✅ 已完成</span>` :
                 `<span class="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200 rounded-full">⏳ 未完成</span>`
               }
             </td>
@@ -164,13 +162,13 @@
         cardsContainer.innerHTML = filteredStudents.map(s => `
           <div class="bg-white border border-gray-100 rounded-lg shadow-sm p-4">
             <div class="mb-3">
-              <span class="inline-flex px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">${escapeHtml(s.username)}</span>
-              <p class="text-base font-semibold text-gray-900 mt-2">${escapeHtml(s.name || '-')}</p>
+              <p class="text-base font-semibold text-gray-900">${escapeHtml(s.name || '-')}</p>
+              <p class="text-xs text-gray-500">年级: ${escapeHtml(s.grade || '-')}</p>
             </div>
             <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
               <p class="text-xs font-semibold text-gray-500 uppercase">状态</p>
-              ${s.resume_url ? 
-                `<span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 rounded-full">✅ 已完成</span>` : 
+              ${s.resume_url ?
+                `<span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200 rounded-full">✅ 已完成</span>` :
                 `<span class="inline-flex items-center px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200 rounded-full">⏳ 未完成</span>`
               }
             </div>
@@ -188,15 +186,15 @@
 
   // 筛选逻辑
   function applyFilters() {
-    const usernameQuery = filterUsername.value.trim().toLowerCase();
     const nameQuery = filterName.value.trim().toLowerCase();
+    const gradeQuery = filterGrade.value.trim().toLowerCase();
     const statusValue = filterStatus.value;
 
     const filtered = studentsData.filter(student => {
-      // 学号匹配
-      if (usernameQuery && !student.username.toLowerCase().includes(usernameQuery)) return false;
       // 姓名匹配
       if (nameQuery && (!student.name || !student.name.toLowerCase().includes(nameQuery))) return false;
+      // 年级匹配（模糊搜索）
+      if (gradeQuery && (!student.grade || !student.grade.toLowerCase().includes(gradeQuery))) return false;
       // 状态匹配
       if (statusValue === 'completed' && !student.resume_url) return false;
       if (statusValue === 'incomplete' && student.resume_url) return false;
@@ -208,8 +206,8 @@
 
   // 重置筛选
   function resetFilters() {
-    filterUsername.value = '';
     filterName.value = '';
+    filterGrade.value = '';
     filterStatus.value = 'all';
     applyFilters();
   }
@@ -228,8 +226,8 @@
   }
 
   // 绑定事件
-  filterUsername.addEventListener('input', applyFilters);
   filterName.addEventListener('input', applyFilters);
+  filterGrade.addEventListener('change', applyFilters);
   filterStatus.addEventListener('change', applyFilters);
   if (resetBtn) resetBtn.addEventListener('click', resetFilters);
 
@@ -250,8 +248,8 @@
         form.appendChild(input);
       };
 
-      addField('username', filterUsername.value.trim());
       addField('name', filterName.value.trim());
+      addField('grade', filterGrade.value);
       addField('status', filterStatus.value);
 
       document.body.appendChild(form);

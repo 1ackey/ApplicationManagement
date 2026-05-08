@@ -61,12 +61,23 @@ db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS student_profile (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+
       user_id INTEGER NOT NULL,
+
+      -- 基础信息
       name TEXT,
-      school TEXT,
-      major TEXT,
+      student_id TEXT UNIQUE,
+
+      -- 年级信息
+      grade TEXT,
+      education_type TEXT,
+      enroll_year INTEGER,
+
+      -- 简历
       resume_url TEXT,
+
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
   `, (err) => {

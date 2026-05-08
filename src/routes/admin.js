@@ -122,7 +122,7 @@ router.post('/applications/bulk-approve', (req, res) => {
 // 岗位管理（控制 visible）
 router.get('/jobs', (req, res) => {
   db.all(
-    `SELECT job.*, company.company_name 
+    `SELECT job.*, company.company_name
      FROM job
      JOIN company ON job.company_id = company.id
      ORDER BY job.created_at DESC`,
@@ -132,6 +132,54 @@ router.get('/jobs', (req, res) => {
       res.render('admin/jobs', { jobs });
     }
   );
+});
+
+// 发布新岗位页面
+router.get('/jobs/new', (req, res) => {
+  db.all(
+    'SELECT id, company_name FROM company ORDER BY company_name',
+    [],
+    (err, companies) => {
+      if (err) return res.render('error', { message: '加载公司列表失败' });
+      res.render('admin/jobForm', { companies: companies || [], error: null });
+    }
+  );
+});
+
+// 创建新岗位
+router.post('/jobs', (req, res) => {
+  const { company_id, title, description, requirement } = req.body;
+  if (!company_id || !title || !description || !requirement) {
+    return db.all(
+      'SELECT id, company_name FROM company ORDER BY company_name',
+      [],
+      (err, companies) => {
+        res.render('admin/jobForm', {
+          companies: companies || [],
+          error: '所有字段均为必填'
+        });
+      }
+    );
+  }
+  db.run(
+    'INSERT INTO job (company_id, title, description, requirement, visible) VALUES (?, ?, ?, ?, 1)',
+    [company_id, title, description, requirement],
+    (err) => {
+      if (err) return res.render('error', { message: '发布岗位失败' });
+      res.redirect('/admin/jobs');
+    }
+  );
+});
+
+// 一键删除所有岗位
+router.post('/jobs/delete-all', (req, res) => {
+  db.run('DELETE FROM application', [], (err) => {
+    if (err) return res.render('error', { message: '删除投递记录失败' });
+    db.run('DELETE FROM job', [], (err2) => {
+      if (err2) return res.render('error', { message: '删除岗位失败' });
+      res.redirect('/admin/jobs');
+    });
+  });
 });
 
 router.post('/jobs/:id/visibility', (req, res) => {
@@ -152,7 +200,7 @@ router.post('/jobs/:id/visibility', (req, res) => {
 // 学生简历库
 router.get('/students', (req, res) => {
   db.all(
-    'SELECT student_profile.*, users.username FROM student_profile JOIN users ON student_profile.user_id = users.id',
+    'SELECT student_profile.*, users.username as student_username FROM student_profile JOIN users ON student_profile.user_id = users.id ORDER BY student_profile.created_at DESC',
     [],
     (err, students) => {
       if (err)
@@ -338,10 +386,10 @@ router.get('/applications/download-all', (req, res) => {
 
 // 批量下载学生简历
 router.post('/students/download', (req, res) => {
-  const { username, name, status } = req.body;
+  const { username, name, status, grade } = req.body;
 
   // 构建查询条件
-  let query = 'SELECT student_profile.*, users.username FROM student_profile JOIN users ON student_profile.user_id = users.id WHERE 1=1';
+  let query = 'SELECT student_profile.*, users.username as student_username FROM student_profile JOIN users ON student_profile.user_id = users.id WHERE 1=1';
   const params = [];
 
   if (username) {
@@ -351,6 +399,10 @@ router.post('/students/download', (req, res) => {
   if (name) {
     query += ' AND student_profile.name LIKE ?';
     params.push(`%${name}%`);
+  }
+  if (grade) {
+    query += ' AND student_profile.grade LIKE ?';
+    params.push(`%${grade}%`);
   }
   if (status === 'completed') {
     query += ' AND student_profile.resume_url IS NOT NULL';
@@ -392,11 +444,11 @@ router.post('/students/download', (req, res) => {
     studentsWithResumes.forEach(student => {
       const filePath = path.join(__dirname, '..', '..', student.resume_url);
       if (fs.existsSync(filePath)) {
-        const extension = path.extname(filePath); 
-        
+        const extension = path.extname(filePath);
+
         // 建议格式：账号_姓名.pdf (因为学生库里重名概率更高)
         const newFileName = `${student.name || '未命名'}${extension}`;
-        
+
         archive.file(filePath, { name: newFileName });
       }
     });

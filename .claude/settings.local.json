@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm start *)",
+      "Bash(curl -s http://localhost:3000/admin/jobs)",
+      "Bash(node -c /c/Users/刘威特/Desktop/ApplicationManagement/src/routes/admin.js)",
+      "Bash(node -c /c/Users/刘威特/Desktop/ApplicationManagement/src/routes/student.js)",
+      "Bash(netstat -ano)",
+      "Bash(npx kill-port *)"
+    ]
+  }
+}
